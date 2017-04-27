@@ -97,7 +97,6 @@ public class resultActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-//        mSectionsPagerAdapter.getPageTitle(0);
 
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);

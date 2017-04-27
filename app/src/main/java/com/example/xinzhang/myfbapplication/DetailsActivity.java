@@ -114,8 +114,6 @@ public class DetailsActivity extends AppCompatActivity {
         type = resultInfo.split("\\|")[3];
         FavKey = id+"|"+type;
         Log.i(TAG, "resultInfo:"+resultInfo+"  id:" +id);
-        Log.i(TAG, "proUrl:"+proUrl);
-
         detailUrl = "http://lowcost-env-hw9.gzaeh2m7fd.us-west-1.elasticbeanstalk.com/index.php?detail="+id+"&hi_img=true";
         Log.i(TAG, " detail url:"+detailUrl);
 
@@ -175,16 +173,13 @@ public class DetailsActivity extends AppCompatActivity {
 //                    String a = detJson.getString("posts");
 //                    Log.i(TAG, " a:" +a);
                     if(!detJson.has("posts")){
-                        Log.i(TAG, " a:" );
                         showNoPosts();
                     }else{
                         JSONObject postJson = detJson.getJSONObject("posts");
-                        Log.i(TAG, " posta not null " );
                         if(!postJson.has("data")){
                             showNoPosts();
                         }else{
                             JSONArray postArr = postJson.getJSONArray("data");
-                            Log.i(TAG, "post leng: "+postArr.length());
                             for(int i = 0; i < postArr.length();i++){
                                 JSONObject onePostJson = postArr.getJSONObject(i);
                                 if(onePostJson.has("message")){
@@ -205,17 +200,13 @@ public class DetailsActivity extends AppCompatActivity {
 
                 try {
                     JSONObject detJson = new JSONObject(detailContent);
-                    Log.i(TAG, "sssss");
                     if(!detJson.has("albums")){
-                        Log.i(TAG, "aa");
                         showNoAlbums();
                     }else{
-//                        Log.i(TAG, "bb");
                         JSONObject albumsJson = detJson.getJSONObject("albums");
                         if(albumsJson.has("data")){
                             Log.i(TAG, "has data");
                             if(albumsJson.getString("data") == "null"){
-//                                Log.i(TAG, "ppppp");
                                 showNoAlbums();
                             }else{
                                 JSONArray albumsArr = albumsJson.getJSONArray("data");
@@ -223,12 +214,10 @@ public class DetailsActivity extends AppCompatActivity {
                                 for(int i = 0; i < albumsArr.length();i++){
                                     JSONObject oneAlbumsJson = albumsArr.getJSONObject(i);
                                     String albumsName = oneAlbumsJson.getString("name");
-//                                Log.i(TAG, " albumsName:"+albumsName);
                                     JSONObject twoPhotos = oneAlbumsJson.getJSONObject("photos");
                                     JSONArray twoPh = twoPhotos.getJSONArray("data");
                                     String photo1ID = twoPh.getJSONObject(0).getString("picture");
                                     String photo2ID = twoPh.getJSONObject(1).getString("picture");
-//                                Log.i(TAG, " photo1ID: "+photo1ID);
                                     albumsHeader.add(albumsName);
                                     List<String> value = new ArrayList<String>();
                                     value.add(photo1ID);

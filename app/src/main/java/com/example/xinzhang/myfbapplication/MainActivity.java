@@ -317,11 +317,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void search(View view) {
-        Log.i(TAG, "222");
         editKeyword = (EditText) findViewById(R.id.keywordEditText);
         System.out.println("----"+editKeyword);
         String keyword = editKeyword.getText().toString();
-        Log.i(TAG, "keyword"+keyword);
         if(keyword == null || keyword.length() == 0){
             Toast.makeText(this,"Please enter a keyword!",Toast.LENGTH_SHORT).show();
         }else{
