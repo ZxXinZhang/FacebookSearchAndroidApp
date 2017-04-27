@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
@@ -31,6 +32,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.internal.LoginAuthorizationType;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +46,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.example.xinzhang.myfbapplication.MainActivity.latitude;
+import static com.example.xinzhang.myfbapplication.MainActivity.longitude;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class resultActivity extends AppCompatActivity {
@@ -62,12 +67,14 @@ public class resultActivity extends AppCompatActivity {
             R.drawable.groups
     };
     TabLayout tabLayout;
-    private LocationManager locationManager;
-    private String locationProvider;
+
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ViewPager mViewPager;
+
+
+
 
 
     @Override
@@ -104,46 +111,19 @@ public class resultActivity extends AppCompatActivity {
         String keyword = intent.getStringExtra(MainActivity.RES_MESSAGE);
         resultActivity.DownloadWebPageTask task = new resultActivity.DownloadWebPageTask();
         url += keyword;
-        url += "&latitude=34.022403&longitude=-118.293853";
+        Log.i(TAG, "location"+latitude+" "+longitude);
+        url += "&latitude="+latitude+"&longitude="+longitude;
         task.execute(new String[]{url});
         ActionBar supportedActionBar = getSupportActionBar();
         if (supportedActionBar != null) {
             supportedActionBar.setDisplayHomeAsUpEnabled(true);
         }
-//        locationManager = (LocationManager) getSystemService(getBaseContext().LOCATION_SERVICE);
-//        List<String> providers = locationManager.getProviders(true);
-//        if (providers.contains(LocationManager.GPS_PROVIDER)) {
-//            //如果是GPS
-//            locationProvider = LocationManager.GPS_PROVIDER;
-//        } else if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
-//            //如果是Network
-//            locationProvider = LocationManager.NETWORK_PROVIDER;
-//        }
-////        else {
-////            Toast.makeText(this, "No Location Provider", Toast.LENGTH_SHORT).show();
-////            return;
-////        }
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        Location location = locationManager.getLastKnownLocation(locationProvider);
-//        if(location!=null){
-//
-//            String locationStr = "维度：" + location.getLatitude() +"\n"
-//                    + "经度：" + location.getLongitude();
-//            Log.i(TAG, "location"+locationStr);
-//        }
-
-//        locationManager.requestLocationUpdates(locationProvider, 3000, 1, locationListener);
     }
+
+
+
+
+
 
     @Override
     protected void onResume() {
@@ -161,6 +141,7 @@ public class resultActivity extends AppCompatActivity {
                 tabLayout.getTabAt(i).setIcon(resIcon[i]);
             }
         }
+
 
 
 
@@ -354,4 +335,7 @@ public class resultActivity extends AppCompatActivity {
             return null;
         }
     }
+
+
+
 }

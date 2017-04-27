@@ -1,12 +1,18 @@
 package com.example.xinzhang.myfbapplication;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -46,8 +52,21 @@ public class MainActivity extends AppCompatActivity
     public final static ArrayList<ResultRow> placeListf = new ArrayList<>();
     public final static ArrayList<ResultRow> groupListf = new ArrayList<>();
     HomeFragment homeFragment;
-//    String resJson;
     EditText editKeyword;
+
+    private LocationManager locationManager;
+    LocationListener mLocationListener;
+    private String locationProvider;
+    public static double latitude = 0.0;
+    public static double longitude = 0.0;
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
     EditText test;
     @Override
@@ -69,6 +88,8 @@ public class MainActivity extends AppCompatActivity
         homeFragment = new HomeFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_main, homeFragment).commit();
+
+        getLocation();
 
         SharedPreferences myPreference=getSharedPreferences("myPreference", Context.MODE_PRIVATE);
         HashMap<String, String> favMap = (HashMap<String, String>) myPreference.getAll();
@@ -97,6 +118,86 @@ public class MainActivity extends AppCompatActivity
             }else if(type.equals("Group")){
                 groupListf.add(new ResultRow(id, proUrl, posterName, type));
             }
+        }
+    }
+
+    public void getLocation() {
+        locationManager = (LocationManager) getSystemService(getApplicationContext().LOCATION_SERVICE);
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(final Location loc) {
+                if (loc != null) {
+                    setLatitude(loc.getLatitude());
+                    setLongitude(loc.getLongitude());
+                } else {
+                    Toast.makeText(getApplicationContext(), "Your current location is temporarily unavailable.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            public void onProviderDisabled(final String s) {
+                Toast.makeText(getApplicationContext(), "onProviderDisabled",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            public void onProviderEnabled(final String s) {
+                Toast.makeText(getApplicationContext(), "onProviderEnabled",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            public void onStatusChanged(final String s, final int i, final Bundle b) {
+                Toast.makeText(getApplicationContext(), "onStatusChanged",
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Location lastKnownLocation = null;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+
+        }
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+            lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            locationProvider = LocationManager.GPS_PROVIDER;
+        } else {
+            lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            locationProvider = LocationManager.NETWORK_PROVIDER;
+        }
+        if (!locationProvider.equals("")) {
+            locationManager.requestLocationUpdates(
+                    locationProvider, 1000, 1, mLocationListener);
+        }
+        if (lastKnownLocation != null) {
+            setLatitude(lastKnownLocation.getLatitude());
+            Log.i(TAG, "last location "+lastKnownLocation.getLatitude());
+            setLongitude(lastKnownLocation.getLongitude());
+        }
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // 取消注册监听
+        if (locationManager != null) {
+            locationManager.removeUpdates(mLocationListener);
         }
     }
 
@@ -136,6 +237,23 @@ public class MainActivity extends AppCompatActivity
             }else if(type.equals("Group")){
                 groupListf.add(new ResultRow(id, proUrl, posterName, type));
             }
+        }
+
+        if (!locationProvider.equals("")) {
+            // 当GPS定位时，在这里注册requestLocationUpdates监听就非常重要而且必要。没有这句话，定位不能成功。
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+
+            }
+            locationManager.requestLocationUpdates(locationProvider, 1000, 1,
+                    mLocationListener);
         }
 
     }
